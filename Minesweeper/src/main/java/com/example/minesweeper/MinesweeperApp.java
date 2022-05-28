@@ -9,6 +9,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MinesweeperApp extends Application {
 
@@ -25,17 +27,56 @@ public class MinesweeperApp extends Application {
         Pane root = new Pane();
         root.setPrefSize(W,H);
 
-            for(int y = 0; y < Y_TILES; y++)
-                for(int x = 0; x < X_TILES; x++)
-                {
-                    Tile tile = new Tile(x,y, Math.random() < 0.2);
+            for(int y = 0; y < Y_TILES; y++) {
+                for (int x = 0; x < X_TILES; x++) {
+                    Tile tile = new Tile(x, y, Math.random() < 0.2);
 
                     grid[x][y] = tile;
                     root.getChildren().add(tile);
                 }
+            }
 
+            for(int y = 0; y < Y_TILES; y++) {
+                for (int x = 0; x < X_TILES; x++) {
+                    Tile tile = grid[x][y];
+                    // set bombs
+                }
+            }
 
         return root;
+    }
+
+    private List<Tile> getNeighbors(Tile tile) {
+        List<Tile> neighbors = new ArrayList<>();
+
+        // ttt
+        // tXt
+        // ttt
+
+        int[] points = new int[] {
+            -1, -1,
+            -1, 0,
+            -1, 1,
+            0, -1,
+            0, 1,
+            1, -1,
+            1, 0,
+            1, 1
+        };
+
+        for (int i = 0; i < points.length; i++) {
+            int dx = points[i];
+            int dy = points[++i];
+
+            int newX = tile.x + dx;
+            int newY = tile.y + dy;
+
+            if (newX >= 0 && newX < X_TILES && newY >= 0 && newY < Y_TILES){
+                neighbors.add(grid[newX][newY]);
+            }
+        }
+
+        return neighbors;
     }
 
     private class Tile extends StackPane {
