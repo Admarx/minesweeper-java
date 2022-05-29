@@ -39,7 +39,14 @@ public class MinesweeperApp extends Application {
             for(int y = 0; y < Y_TILES; y++) {
                 for (int x = 0; x < X_TILES; x++) {
                     Tile tile = grid[x][y];
-                    // set bombs
+
+                    if(tile.hasBomb)
+                        continue;
+
+                    long bombs = getNeighbors(tile).stream().filter(t -> t.hasBomb).count();
+
+                    if(bombs > 0)
+                        tile.text.setText(String.valueOf(bombs));
                 }
             }
 
@@ -82,8 +89,7 @@ public class MinesweeperApp extends Application {
     private class Tile extends StackPane {
         private int x,y;
         private boolean hasBomb;
-        private int bombs = 0;
-
+        private boolean isOpen = false;
         private Rectangle border = new Rectangle(TILE_SIZE -2, TILE_SIZE -2);
         private Text text = new Text();
 
@@ -96,7 +102,9 @@ public class MinesweeperApp extends Application {
             border.setFill(Color.BLACK);
             border.setStroke(Color.LIGHTGRAY);
 
+            text.setFont(Font.font(18));
             text.setText(hasBomb? "X" : "");
+            text.setVisible(false);
 
             getChildren().addAll(border, text);
 
@@ -104,11 +112,21 @@ public class MinesweeperApp extends Application {
             setTranslateY(y * TILE_SIZE);
         }
 
+        public void open()
+        {
+            if(isOpen)
+                return;
+            text.setVisible(true);
+            border.setFill(null);
+        }
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene (createContent());
+
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args){
