@@ -7,6 +7,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class MinesweeperApp extends Application {
     private static final int Y_TILES = H/TILE_SIZE;
 
     private Tile[][] grid = new Tile[X_TILES][Y_TILES];
+    private Scene scene;
+
     private Parent createContent()
     {
         Pane root = new Pane();
@@ -110,23 +113,37 @@ public class MinesweeperApp extends Application {
 
             setTranslateX(x * TILE_SIZE);
             setTranslateY(y * TILE_SIZE);
+
+            setOnMouseClicked(e -> open());
         }
 
         public void open()
         {
             if(isOpen)
                 return;
+
+            if (hasBomb) {
+                System.out.println("Game Over");
+                scene.setRoot(createContent());
+                return;
+            }
+
+            isOpen = true;
             text.setVisible(true);
             border.setFill(null);
+
+            if (text.getText().isEmpty()) {
+                getNeighbors(this).forEach(Tile::open);
+            }
         }
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene (createContent());
+        scene = new Scene (createContent());
 
-        stage.setScene(scene);
-        stage.show();
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public static void main(String[] args){
