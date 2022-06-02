@@ -3,6 +3,8 @@ package com.example.minesweeper;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -15,30 +17,31 @@ import java.util.List;
 
 public class MinesweeperApp extends Application {
 
-    private static final int TILE_SIZE = 40;
-    private static final int W = 800;
-    private static final int H = 600;
+    private static final int TILE_SIZE = 40; // Tile size in pixels
+    private static final int W = 800; // Application width
+    private static final int H = 600; // Application height
 
-    private static final int X_TILES = W/TILE_SIZE;
-    private static final int Y_TILES = H/TILE_SIZE;
+    private static final int X_TILES = W/TILE_SIZE; // Amount of tiles on the X axis
+    private static final int Y_TILES = H/TILE_SIZE; // Amount of tiles on the Y axis
+    private static final double BOMB_DISTRIBUTION = 0.2; // Amount of bombs in the range from 0 to 1 (0 = 0% bombs, 1 = 100% bombs)
 
-    private Tile[][] grid = new Tile[X_TILES][Y_TILES];
+    private Tile[][] grid = new Tile[X_TILES][Y_TILES]; // We create a field for our game
     private Scene scene;
 
     private Parent createContent()
     {
         Pane root = new Pane();
         root.setPrefSize(W,H);
-
+        // This nested loop generates our minefield
             for(int y = 0; y < Y_TILES; y++) {
                 for (int x = 0; x < X_TILES; x++) {
-                    Tile tile = new Tile(x, y, Math.random() < 0.2);
+                    Tile tile = new Tile(x, y, Math.random() < BOMB_DISTRIBUTION);
 
                     grid[x][y] = tile;
                     root.getChildren().add(tile);
                 }
             }
-
+        // This nested loop determines how many bombs are there in the neighboring tiles and sets it as text.
             for(int y = 0; y < Y_TILES; y++) {
                 for (int x = 0; x < X_TILES; x++) {
                     Tile tile = grid[x][y];
@@ -59,6 +62,7 @@ public class MinesweeperApp extends Application {
     private List<Tile> getNeighbors(Tile tile) {
         List<Tile> neighbors = new ArrayList<>();
 
+        // Visualisation of neighboring fields - helps understand points array
         // ttt
         // tXt
         // ttt
@@ -74,6 +78,7 @@ public class MinesweeperApp extends Application {
             1, 1
         };
 
+        // This loop counts amount of bombs in the vicinity of the neighbour
         for (int i = 0; i < points.length; i++) {
             int dx = points[i];
             int dy = points[++i];
@@ -123,6 +128,13 @@ public class MinesweeperApp extends Application {
                 return;
 
             if (hasBomb) {
+
+                Alert alert = new Alert(Alert.AlertType.NONE);
+                alert.setTitle("GAME OVER");
+                alert.setContentText("You have tripped a mine");
+                alert.getDialogPane().getButtonTypes().add(ButtonType.OK);
+                alert.showAndWait();
+
                 System.out.println("Game Over");
                 scene.setRoot(createContent());
                 return;
